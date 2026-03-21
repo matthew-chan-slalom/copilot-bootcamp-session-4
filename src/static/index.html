@@ -44,6 +44,26 @@
         </form>
         <div id="message" class="hidden"></div>
       </section>
+
+      <section id="matching-container">
+        <h3>Team Matching Recommendations</h3>
+        <form id="matching-form">
+          <div class="form-group">
+            <label for="matching-capability">Select Capability:</label>
+            <select id="matching-capability" required>
+              <option value="">-- Select a capability --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="top-n">Number of recommendations:</label>
+            <input type="number" id="top-n" min="1" max="10" value="5" required />
+          </div>
+          <button type="submit">Get Recommendations</button>
+        </form>
+        <div id="recommendations-list" class="recommendations-list">
+          <p><em>Select a capability to view ranked consultant recommendations.</em></p>
+        </div>
+      </section>
     </main>
 
     <footer>
