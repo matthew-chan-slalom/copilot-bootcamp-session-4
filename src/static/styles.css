@@ -218,6 +218,40 @@ button[type="submit"]:hover {
   border-radius: 4px;
 }
 
+#matching-container {
+  max-width: 1040px;
+}
+
+.recommendations-list {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.recommendation-card {
+  border: 1px solid #dce8f7;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9fcff;
+}
+
+.recommendation-card h4 {
+  color: #003d7a;
+  margin-bottom: 6px;
+}
+
+.recommendation-card p {
+  margin-bottom: 6px;
+}
+
+.explainability-grid {
+  margin-top: 8px;
+  border-top: 1px dashed #bfd4ec;
+  padding-top: 8px;
+  font-size: 0.92rem;
+}
+
 .success {
   background-color: #e8f5e9;
   color: #2e7d32;

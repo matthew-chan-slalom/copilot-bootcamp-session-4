@@ -39,6 +39,21 @@ A FastAPI application that enables Slalom consultants to register their capabili
 | GET    | `/capabilities`                                                   | Get all capabilities with details and current consultant assignments |
 | POST   | `/capabilities/{capability_name}/register?email=consultant@slalom.com` | Register consultant for a capability                     |
 | DELETE | `/capabilities/{capability_name}/unregister?email=consultant@slalom.com` | Unregister consultant from a capability              |
+| GET    | `/capabilities/{capability_name}/recommendations?top_n=5` | Get ranked consultant recommendations with explainability |
+
+## Team Matching Scoring Model
+
+The recommendations endpoint uses deterministic weighted scoring (no ML) so ranking is transparent and repeatable.
+
+| Factor | Weight | Details |
+| ------ | ------ | ------- |
+| Skill level match | 35 | Compares consultant skill level to capability target level |
+| Certification overlap | 25 | Scores overlap between consultant and capability certifications |
+| Availability | 20 | Scales consultant available hours/week up to 20h |
+| Practice area alignment | 10 | Full points when practice area matches |
+| Industry overlap | 10 | Partial score based on shared industry verticals |
+
+Each recommendation includes an `explainability` object with per-factor points and rationale.
 
 ## Data Model
 

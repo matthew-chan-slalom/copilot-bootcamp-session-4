@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const capabilitiesList = document.getElementById("capabilities-list");
   const capabilitySelect = document.getElementById("capability");
+  const matchingCapabilitySelect = document.getElementById("matching-capability");
+  const matchingForm = document.getElementById("matching-form");
+  const topNInput = document.getElementById("top-n");
+  const recommendationsList = document.getElementById("recommendations-list");
   const registerForm = document.getElementById("register-form");
   const messageDiv = document.getElementById("message");
 
@@ -14,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
       capabilitiesList.innerHTML = "";
 
       // Populate capabilities list
+      capabilitySelect.innerHTML = '<option value="">-- Select a capability --</option>';
+      matchingCapabilitySelect.innerHTML = '<option value="">-- Select a capability --</option>';
+
       Object.entries(capabilities).forEach(([name, details]) => {
         const capabilityCard = document.createElement("div");
         capabilityCard.className = "capability-card";
@@ -56,6 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = name;
         option.textContent = name;
         capabilitySelect.appendChild(option);
+
+        const matchingOption = document.createElement("option");
+        matchingOption.value = name;
+        matchingOption.textContent = name;
+        matchingCapabilitySelect.appendChild(matchingOption);
       });
 
       // Add event listeners to delete buttons
@@ -68,6 +80,61 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching capabilities:", error);
     }
   }
+
+  function renderRecommendations(payload) {
+    const recommendations = payload.recommendations || [];
+
+    if (recommendations.length === 0) {
+      recommendationsList.innerHTML = "<p><em>No available consultants to recommend for this capability.</em></p>";
+      return;
+    }
+
+    const cardsHTML = recommendations
+      .map((item, index) => {
+        const explain = item.explainability || {};
+        return `
+          <article class="recommendation-card">
+            <h4>#${index + 1} ${item.name}</h4>
+            <p><strong>Email:</strong> ${item.email}</p>
+            <p><strong>Match Score:</strong> ${item.score} / 100</p>
+            <div class="explainability-grid">
+              <p><strong>Skill:</strong> ${explain.skill_level?.points || 0} pts (${explain.skill_level?.reason || "N/A"})</p>
+              <p><strong>Certifications:</strong> ${explain.certifications?.points || 0} pts (${explain.certifications?.reason || "N/A"})</p>
+              <p><strong>Availability:</strong> ${explain.availability?.points || 0} pts (${explain.availability?.reason || "N/A"})</p>
+              <p><strong>Practice Area:</strong> ${explain.practice_area?.points || 0} pts (${explain.practice_area?.reason || "N/A"})</p>
+              <p><strong>Industry:</strong> ${explain.industry_overlap?.points || 0} pts (${explain.industry_overlap?.reason || "N/A"})</p>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+
+    recommendationsList.innerHTML = cardsHTML;
+  }
+
+  matchingForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const capability = matchingCapabilitySelect.value;
+    const topN = topNInput.value;
+
+    try {
+      const response = await fetch(
+        `/capabilities/${encodeURIComponent(capability)}/recommendations?top_n=${encodeURIComponent(topN)}`
+      );
+      const result = await response.json();
+
+      if (!response.ok) {
+        recommendationsList.innerHTML = `<p class="error">${result.detail || "Failed to load recommendations."}</p>`;
+        return;
+      }
+
+      renderRecommendations(result);
+    } catch (error) {
+      recommendationsList.innerHTML = "<p class=\"error\">Failed to load recommendations. Please try again.</p>";
+      console.error("Error fetching recommendations:", error);
+    }
+  });
 
   // Handle unregister functionality
   async function handleUnregister(event) {
